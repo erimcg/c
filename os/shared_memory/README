@@ -1,0 +1,32 @@
+Type 'make' to compile.
+
+The broker, consumer and producer print the number of elements in 
+a buffer. This is displayed as '(# in buffer)' where # is the value
+of an integer stored in shared memory. Both the consumer and 
+producer modify this value in a non-atomic way, thus can produce a
+bug. 
+
+Suppose the buffer is empty to begin with.  If the producer produces 
+X objects and the consumer consumes X objects then when the consumer 
+finishes there should be 0 elements in the buffer.
+
+Sometimes you can see a counting bug when running the following 
+commands. When finished look at the number of elements that the
+consumer reports are in the buffer.
+
+
+Run the broker in the background
+$ ./broker &
+
+Run the consumer (num items:10000, pause duration:0)
+$ ./consumer 10000 0
+
+Run the producer (num items:10000, pause duration:0)
+$ ./producer 10000 0
+
+Get the PID of the broker
+$ ps ax		// look for ./broker
+
+Wake up the broker, allowing it to free resources and terminate.
+$ kill -10 PID
+
