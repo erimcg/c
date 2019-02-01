@@ -1,6 +1,5 @@
 # Operating System Examples
 
-
 1. [Creating a New Process with Fork](fork)
 
 2. [Executing a File Using Each Exec Call](exec)
