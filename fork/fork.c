@@ -15,7 +15,7 @@ int  main() {
 			exit(1);
 		}
 	}
-	else if (pid == 0) { 
+	else if (pid > 0) { 
 		if (waitpid(pid, NULL, 0) == -1) {
 			printf("Error waiting on child: %s\n", strerror(errno));
 			exit(1);
