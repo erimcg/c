@@ -15,11 +15,14 @@ int  main() {
 			exit(1);
 		}
 	}
-	else { 
+	else if (pid == 0) { 
 		if (waitpid(pid, NULL, 0) == -1) {
 			printf("Error waiting on child: %s\n", strerror(errno));
 			exit(1);
 		}
+	}
+	else if (pid == -1) {
+		printf("Error forking child: %s\n", strerror(errno));
 	}
 
 	return 0;
