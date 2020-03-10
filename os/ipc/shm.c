@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	printf("Page size: %ld\n", bufsz);
 
 	int shmid;
-	if ((shmid = shmget(key, bufsz, IPC_CREAT | 0600)) == -1)
+	if ((shmid = shmget(key, bufsz, IPC_CREAT | 0666)) == -1)
 		print_error("Can not create shared memory", errno);
 
 	printf("Shared memory id: %d\n", shmid);
