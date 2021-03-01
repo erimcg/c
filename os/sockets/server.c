@@ -5,14 +5,14 @@
  * Eric McGregor 02/27/15
  */
 
-#include <sys/types.h>	// getaddrinfo()
-#include <netdb.h>	// getaddrinfo()
-#include <sys/socket.h> // getaddrinfo()
-#include <stdio.h>	// printf()
-#include <stdlib.h> 	// exit()
-#include <unistd.h>	// gethostname()
-#include <arpa/inet.h>  // inet_ntop()
-#include <string.h>	// strerror()
+#include <sys/types.h>	
+#include <netdb.h>
+#include <sys/socket.h> 
+#include <stdio.h>	
+#include <stdlib.h> 
+#include <unistd.h>	
+#include <arpa/inet.h>  
+#include <string.h>	
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -33,19 +33,12 @@ void print_error(char *);
 
 int main(int argc, char *argv[]) 
 {
-	char *host_name;
+	char *host_name = malloc(HOST_NAME_MAX);
+	memset(host_name, 0, HOST_NAME_MAX);
 
-    	if (argc == 2) {
-		host_name = argv[1];		
-	}
-	else {
-		host_name = malloc(HOST_NAME_MAX);
-		memset(host_name, 0, HOST_NAME_MAX);
-
-		if (gethostname(host_name, HOST_NAME_MAX) < 0) {
-			print_error("gethostname error");
-			return(-1);
-		}
+	if (gethostname(host_name, HOST_NAME_MAX) < 0) {
+		print_error("gethostname error");
+		return(-1);
 	}
 
 	printf("host name: %s\n", host_name);
@@ -54,40 +47,38 @@ int main(int argc, char *argv[])
 	struct addrinfo 	hint;
 
 	hint.ai_flags = 0;
-        hint.ai_family = 0;
-        hint.ai_socktype = SOCK_STREAM;
-        hint.ai_protocol = 0;
-        hint.ai_addrlen = 0;
-        hint.ai_canonname = NULL;
-        hint.ai_addr = NULL;
-        hint.ai_next = NULL;
+    hint.ai_family = 0;
+    hint.ai_socktype = SOCK_STREAM;
+    hint.ai_protocol = 0;
+    hint.ai_addrlen = 0;
+    hint.ai_canonname = NULL;
+    hint.ai_addr = NULL;
+    hint.ai_next = NULL;
 
-	if ((getaddrinfo(host_name, "tokenserver", &hint, &host_ai)) != 0) { 
-		print_error("getaddrinfo error");
-        	exit(1);
-	}
+	int err;
+    if ((err = getaddrinfo(host_name, "tokenserver", &hint, &host_ai)) != 0) {
+        printf("getaddrinfo error: %s\n", gai_strerror(err));
+        return 0;
+    }
 
 	print_ip_addresses(host_ai);
 
-    	int host_fd;
+   	int host_fd;
 	if ((host_fd = socket(host_ai->ai_addr->sa_family, SOCK_STREAM, 0)) < 0) {
 		print_error("unable to create socket"); 
-		return(-1);
 	}
 	printf("socket created [%d]\n", host_fd);
 
-        if (bind(host_fd, host_ai->ai_addr, host_ai->ai_addrlen) < 0) {
-                print_error("unable to bind to socket");
-                exit(1);
-        }
+    if (bind(host_fd, host_ai->ai_addr, host_ai->ai_addrlen) < 0) {
+        print_error("unable to bind to socket");
+    }
 	printf("bind returned success\n");
 
 	freeaddrinfo(host_ai);
 
-        if (listen(host_fd, QLEN) < 0) {
-                print_error("listen failed");
-                exit(1);
-        }
+    if (listen(host_fd, QLEN) < 0) {
+        print_error("listen failed");
+    }
 	printf("listen returned success\n");
 
 	int last_client_ip_int = 0;
@@ -99,27 +90,11 @@ int main(int argc, char *argv[])
 	for (;;) {
 
 		printf("waiting for connection ...\n");
-        	int clfd = accept(host_fd, &client_sockaddr, &client_sockaddr_len);
-        	if (clfd < 0) {
+       	int clfd = accept(host_fd, &client_sockaddr, &client_sockaddr_len);
+       	if (clfd < 0) {
 			print_error("accept error");
-			exit(1); 
 		}
 		printf("accepted connection, socket [%d]\n", clfd);
-
-		if (client_sockaddr.sa_family != AF_INET) {
-			printf("Can not onnect with IPv6 addresses\n");
-			printf("Sending -1\n");
-
-			int mssg = -1;
-			int len = send(clfd, &mssg, 4, 0);
-			if (len < 0) {
-				print_error("error sending data");
-			}
-			printf("sent %d bytes\n", len);
-
-			close(clfd);
-			continue;
-		}
 
 		printf("sending token [%d]...\n", token);
 		int len = send(clfd, &token, 4, 0);
@@ -131,7 +106,8 @@ int main(int argc, char *argv[])
 		token++;
 		printf("sent %d bytes\n", len);
 		close(clfd);
-	} 
+	}
+ 
 	close(host_fd);
 }
 
@@ -164,7 +140,6 @@ void print_ip_addresses(struct addrinfo *host_ai)
 
 void print_error(char *str) {
 	printf("%s: %s\n", str, strerror(errno));
-	//printf("%s\n", str);
 	exit(1);
 }
 

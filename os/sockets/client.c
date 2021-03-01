@@ -6,21 +6,20 @@
 #include <unistd.h>
 #include <string.h>
 
-#define MAXADDRLEN 256
-#define BUFLEN 128
-
 extern int errno;
+static int sockfd;
 
 void print_error(char *);
 
 int main(int argc, char *argv[]) {
 	struct addrinfo *host_ai;
 	struct addrinfo hint;
-	int sockfd, err;
+	int err;
     
-	if (argc != 2)
+	if (argc != 2) {
         	print_error("usage: client hostname");
-    
+    }
+
 	hint.ai_flags = 0;
     	hint.ai_family = AF_INET;
     	hint.ai_socktype = SOCK_STREAM;
@@ -43,6 +42,7 @@ int main(int argc, char *argv[]) {
 
 	printf("attempting Connection\n");
 	if (connect(sockfd, host_ai->ai_addr, host_ai->ai_addrlen) != 0) {
+		close(sockfd);
 		printf("can't connect to %s\n", argv[1]);
 		print_error("Error connecting to server");
 	}
@@ -56,13 +56,11 @@ int main(int argc, char *argv[]) {
 	if (n > 0) 
 		printf("from server [%d]\n", token);
    	else {
-		printf("recv returned: %d\n", n); 
-       		print_error("recv error");
+		printf("recv error:  %d\n", n); 
 	}
 
 	close(sockfd);
-	
-    	exit(1);
+	return 0;	
 }
 
 
