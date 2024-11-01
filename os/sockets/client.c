@@ -21,13 +21,13 @@ int main(int argc, char *argv[]) {
     }
 
 	hint.ai_flags = 0;
-    	hint.ai_family = AF_INET;
-    	hint.ai_socktype = SOCK_STREAM;
-    	hint.ai_protocol = 0;
-    	hint.ai_addrlen = 0;
-    	hint.ai_canonname = NULL;
-    	hint.ai_addr = NULL;
-    	hint.ai_next = NULL;
+    hint.ai_family = AF_INET;
+    hint.ai_socktype = SOCK_STREAM;
+    hint.ai_protocol = 0;
+    hint.ai_addrlen = 0;
+    hint.ai_canonname = NULL;
+    hint.ai_addr = NULL;  //struct sockaddr*
+    hint.ai_next = NULL;
 
 	if ((err = getaddrinfo(argv[1], "tokenserver", &hint, &host_ai)) != 0) {
 		printf("getaddrinfo error: %s\n", gai_strerror(err));

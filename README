@@ -1,0 +1,31 @@
+Suppose you have a local repo in /some-path/A and another one in /other-path/B
+that you want to work on independently, but want B to be in a subdirectory of A
+on GitHub.
+
+To do this we make B a subtree of A locally, pull from the local B, and push A 
+when changes to A or B occur.
+
+In A ...
+
+Create a remote for B so you don't have to type the path to the repo repeatedly
+
+	$git remote add B /other-path/B/.git
+
+Add B as a subtree in A. This commits all of B into A. The first B is the name 
+of the dir created in A, the second is the remote I just created in 1.
+
+	$git subtree add -m "added B" --prefix B B master --squash
+
+Push the changes to GitHub
+
+	$git push origin master
+
+
+Later, when you change something in B.  Commit them to B as normal.  Then in A,
+pull the change into A.
+
+	$git subtree pull -m "updated B" --prefix B B master --squash
+
+Push the changes to GitHub
+
+	$git push origin master

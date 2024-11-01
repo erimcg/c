@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
 
 		printf("waiting for connection ...\n");
 		int clfd = accept(host_fd, &client_sockaddr, &client_sockaddr_len);
+
 		if (clfd < 0) {
 			print_error("accept error");
 		}
